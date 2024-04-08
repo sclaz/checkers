@@ -11,99 +11,32 @@ function update(state, msg) {
     return state;
 }
 
+function row() {
+    return h("div", {class: "row"}, [
+        h("div", {class: "box"}, []),
+        h("div", {class: "box"}, []),
+        h("div", {class: "box"}, []),
+        h("div", {class: "box"}, []),
+        h("div", {class: "box"}, []),
+        h("div", {class: "box"}, []),
+        h("div", {class: "box"}, []),
+        h("div", {class: "box"}, []),
+    ]);
+}
+
 function view(state) {
     return [
         h("h1", {id:"title"}, [text("Checkers")]),
 
         h("div", {class: "board"}, [
-
-            h("div", {class: "row"}, [
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-            ]),
-
-            h("div", {class: "row"}, [
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-            ]),
-
-            h("div", {class: "row"}, [
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-            ]),
-
-            h("div", {class: "row"}, [
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-            ]),
-
-            h("div", {class: "row"}, [
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-            ]),
-
-            h("div", {class: "row"}, [
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-            ]),
-
-            h("div", {class: "row"}, [
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-            ]),
-
-            h("div", {class: "row"}, [
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-                h("div", {class: "box"}, []),
-            ]),
+            row(),
+            row(),
+            row(),
+            row(),
+            row(),
+            row(),
+            row(),
+            row(),  
         ]),       
     ];
 }
