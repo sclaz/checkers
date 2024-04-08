@@ -13,7 +13,7 @@ function update(state, msg) {
 
 function view(state) {
     return [
-        h("h1", {}, [text("Checkers")]),
+        h("h1", {id:"title"}, [text("Checkers")]),
 
         h("div", {class: "board"}, [
 

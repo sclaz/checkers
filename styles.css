@@ -1,13 +1,23 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     background-color: green;
 }
 
+#title {
+    text-align: center;
+}
+
 .board {
     border:2px solid brown;
+    width: 404;
+    margin: auto;
 }
 
 .row {
-
+    display: inline-block;
 }
 
 .box {
