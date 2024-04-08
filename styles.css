@@ -26,3 +26,11 @@ body {
     height: 50px;
     display: inline-block;
 }
+
+.row:nth-child(even) .box:nth-child(odd) {
+    background-color: black;
+}
+
+.row:nth-child(odd) .box:nth-child(even) {
+    background-color: black;
+}
