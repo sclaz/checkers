@@ -23,6 +23,13 @@
 //
 const UI = (function () {
 
+    function assert(predicate, ...args) {
+      if (!predicate) {
+        console.error(...args);
+        throw new Error("fatal");
+      }
+    }
+
     let props = new Set([ "autoplay", "checked", "checked", "contentEditable", "controls",
       "default", "hidden", "loop", "selected", "spellcheck", "value", "id", "title",
       "accessKey", "dir", "dropzone", "lang", "src", "alt", "preload", "poster",
@@ -31,7 +38,7 @@ const UI = (function () {
       "name", "pattern", "htmlFor", "max", "min", "step", "wrap", "useMap", "shape",
       "coords", "align", "cite", "href", "target", "download", "download",
       "hreflang", "ping", "start", "headers", "scope", "span" ]);
-    
+
     function setAttribute(attr, value, el) {
       if (props.has(attr)) {
         el[attr] = value;
@@ -39,67 +46,75 @@ const UI = (function () {
         el.setAttribute(attr, value);
       }
     }
-    
+
+    function listener(event) {
+      const el = event.currentTarget;
+      const handler = el._ui.listeners[event.type];
+      const enqueue = el._ui.enqueue;
+      assert(typeof enqueue == "function", "Invalid enqueue");
+      const msg = handler(event);
+      if (msg !== undefined) {
+        enqueue(msg);
+      }
+    }
+
+    function setListener(el, event, handle) {
+      assert(typeof handle == "function", "Event listener is not a function for event:", event);
+
+      if (el._ui.listeners[event] === undefined) {
+        el.addEventListener(event, listener);
+      }
+
+      el._ui.listeners[event] = handle;
+    }
+
     function eventName(str) {
       if (str.indexOf("on") == 0) {
         return str.slice(2).toLowerCase();
       }
       return null;
     }
-    
+
     // diff two specs
     function diffOne(l, r) {
+      assert(r instanceof Element, "Expected an instance of Element, found", r);
       let isText = l.textContent !== undefined;
       if (isText) {
         return l.textContent !== r.textContent
           ? { replace: r }
           : { noop : true };
       }
-    
+
       if (l.tag !== r.tag) {
         return { replace: r };
       }
-    
-      const removeAttr = [];
-      const setAttr = {};
-      const removeListeners = {};
-      const addListeners = {};
+
+      const remove = [];
+      const set = {};
+
       for (const attr in l.attributes) {
         if (r.attributes[attr] === undefined) {
-          let event = eventName(attr);
-          if (event !== null) {
-            removeListeners[event] = l.attributes[attr];
-          } else {
-            removeAttr.push(attr);
-          }
+          remove.push(attr);
         }
       }
-    
+
       for (const attr in r.attributes) {
         if (r.attributes[attr] !== l.attributes[attr]) {
-          let event = eventName(attr);
-          if (event === null) {
-            setAttr[attr] = r.attributes[attr];
-          } else {
-            removeListeners[event] = l.attributes[attr];
-            addListeners[event] = r.attributes[attr];
-          }
+          set[attr] = r.attributes[attr];
         }
       }
-    
+
       const children = diffList(l.children, r.children);
       const noChildrenChange = children.every(e => e.noop);
       const noAttributeChange =
-            (removeAttr.length === 0) &&
-            (Array.from(Object.keys(setAttr)).length == 0)
-    
-      if (noChildrenChange && noAttributeChange) {
-        return { noop : true };
-      }
-    
-      return { modify: { removeAttr, setAttr, removeListeners, addListeners, children } };
+            (remove.length === 0) &&
+            (Array.from(Object.keys(set)).length == 0);
+
+      return (noChildrenChange && noAttributeChange)
+        ? { noop : true }
+        : { modify: { remove, set, children } };
     }
-    
+
     function diffList(ls, rs) {
       let len = Math.max(ls.length, rs.length);
       let diffs = [];
@@ -114,63 +129,57 @@ const UI = (function () {
       }
       return diffs;
     }
-    
-    function addListener(enqueue, el, event, handle) {
-      if (typeof handle !== "function") {
-        throw Error(`Event listener for ${attr} is not a function`);
-      }
-      const listener = e => enqueue(handle(e));
-      el._ui.listeners[event] = listener;
-      el.addEventListener(event, listener);
-    }
-    
+
     function create(enqueue, spec) {
+      assert(spec instanceof Element, "Expected an instance of Element, found", spec);
+
       if (spec.textContent !== undefined) {
         let el = document.createTextNode(spec.textContent);
         return el;
       }
-    
+
       let el = document.createElement(spec.tag);
-      el._ui = { listeners : [] };
-    
+      el._ui = { listeners : {}, enqueue };
+
       for (const attr in spec.attributes) {
         let event = eventName(attr);
         let value = spec.attributes[attr];
-        event
-          ? addListener(enqueue, el, event, value)
-          : setAttribute(attr, value, el);
+        (event === null)
+          ? setAttribute(attr, value, el)
+          : setListener(el, event, value);
       }
-    
-      for (let i in spec.children) {
-        const childSpec = spec.children[i];
+
+      for (let childSpec of spec.children) {
         const child = create(enqueue, childSpec);
         el.appendChild(child);
       }
-    
+
       return el;
     }
-    
+
     function modify(el, enqueue, diff) {
-      for (const attr in diff.removeAttr) {
-        el.removeAttribute(attr);
+      for (const attr of diff.remove) {
+        const event = eventName(attr);
+        if (event === null) {
+          el.removeAttribute(attr);
+        } else {
+          el._ui.listeners[event] = undefined;
+          el.removeEventListener(event, listener);
+        }
       }
-      for (const attr in diff.setAttr) {
-        setAttribute(attr, diff.setAttr[attr], el);
+
+      for (const attr in diff.set) {
+        const value = diff.set[attr];
+        const event = eventName(attr);
+        (event === null)
+          ? setAttribute(attr, value, el)
+          : setListener(el, event, value);
       }
-      for (const event in diff.removeListeners) {
-        el.removeEventListener(event, el._ui.listeners[event]);
-      }
-      for (const event in diff.addListeners) {
-        let handle = diff.addListeners[event];
-        addListener(enqueue, el, event, handle);
-      }
-      if (diff.children.length < el.childNodes.length) {
-        throw new Error("unmatched children lengths");
-      }
-    
+
+      assert(diff.children.length >= el.childNodes.length, "unmatched children lengths");
       apply(el, enqueue, diff.children);
     }
-    
+
     function apply(el, enqueue, childrenDiff) {
       for (let i = 0, k = 0; i < childrenDiff.length; i++, k++) {
         let diff = childrenDiff[i];
@@ -180,73 +189,73 @@ const UI = (function () {
             el.childNodes[k].remove();
             k--;
             break;
-    
+
           case "modify":
             modify(el.childNodes[k], enqueue, diff.modify);
             break;
-    
+
           case "create": {
-            if (k < el.childNodes.length) {
-              throw new Error("Adding in the middle of children: " + k + " " + el.childNodes.length);
-            }
+            const len = el.childNodes.length;
+            assert(k === len, "adding to the middle of children", k, len);
             let child = create(enqueue, diff.create);
             el.appendChild(child);
             break;
           }
-    
+
           case "replace": {
             let child = create(enqueue, diff.replace);
             el.childNodes[k].replaceWith(child);
             break;
           }
-    
+
           case "noop":
             break;
-    
+
           default:
             throw new Error("Unexpected diff option: " + Object.keys(diff));
         }
       }
     }
-    
+
+    class Element {
+      constructor(any) { Object.assign(this, any) }
+    }
+
     // Create an HTML element
     function h(tag, attributes, children) {
-      console.assert(typeof tag === "string");
-      console.assert(typeof attributes === "object");
-      console.assert(Array.isArray(children) && !children.includes(undefined));
-      return { tag, attributes, children };
+      assert(typeof tag === "string", "Invalid tag value:", tag);
+      assert(typeof attributes === "object", "Expected attributes object. Found:", attributes);
+      assert(Array.isArray(children), "Expected children array. Found:", children);
+      return new Element({ tag, attributes, children });
     }
-    
+
     // Create a text element
     function text(textContent) {
-      return { textContent }
+      return new Element({ textContent });
     }
-    
+
     // Start managing the contents of an HTML node.
     function init(root, initialState, update, view) {
       let state = initialState; // client application state
       let spec = []; // elements spec
       let queue = []; // msg queue
-    
+
       function enqueue(msg) {
         queue.push(msg);
       }
-    
+
       // draws the current state
       function draw() {
         let newSpec = view(state);
-        if (!Array.isArray(newSpec)) {
-          throw new Error("Return value of view function is not an array.");
-        }
         apply(root, enqueue, diffList(spec, newSpec));
         spec = newSpec;
       }
-    
+
       function updateState() {
         if (queue.length > 0) {
           let msgs = queue;
           queue = [];
-    
+
           msgs.forEach(msg => {
             try {
               state = update(state, msg, enqueue);
@@ -254,18 +263,18 @@ const UI = (function () {
               console.error(e);
             }
           });
-    
+
           draw();
         }
-    
+
         window.requestAnimationFrame(updateState);
       }
-    
+
       draw();
       updateState();
-    
+
       return { enqueue };
     }
-    
+
     return { init, h, text };
-    })();
+})();
