@@ -13,9 +13,16 @@ function update(state, msg) {
 }
 
 function row(highlighted, rowNumber) {
-    let boxes = [];
+    const boxes = [];
     for (let i = 0; i < 8; i++) {
-      boxes.push(h("div", {class: "box", onClick: () => boxNumber(rowNumber, i), style: addHighlight(highlighted, boxNumber(rowNumber, i))}, []));
+        const number = boxNumber(rowNumber, i);
+        const boxesObjects = { 
+            class: "box", 
+            onClick: () => number, 
+            style: addHighlight(highlighted, number)
+        };
+        const box = h("div", boxesObjects, []);
+        boxes.push(box);
     }
 
     return h("div", {class: "row"}, boxes);
