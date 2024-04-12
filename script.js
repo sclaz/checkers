@@ -26,19 +26,14 @@ function row(highlighted, rowNumber) {
 }
 
 function view(state) {
+    let rows = [];
+    for (let i = 0; i < 8; i++) {
+        rows.push(row(state.selected, i));
+    }
+
     return [
         h("h1", {id:"title"}, [text("Checkers")]),
-
-        h("div", {class: "board"}, [
-            row(state.selected, 0),
-            row(state.selected, 1),
-            row(state.selected, 2),
-            row(state.selected, 3),
-            row(state.selected, 4),
-            row(state.selected, 5),
-            row(state.selected, 6),
-            row(state.selected, 7),  
-        ]),       
+        h("div", {class: "board"}, rows),       
     ];
 }
 
@@ -51,3 +46,4 @@ function boxNumber(rowNumber, columnNumber){
     let i = rowNumber * 8 + columnNumber
     return i;
 }
+
