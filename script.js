@@ -13,16 +13,12 @@ function update(state, msg) {
 }
 
 function row(highlighted, rowNumber) {
-    return h("div", {class: "row"}, [
-        h("div", {class: "box", onClick: () => boxNumber(rowNumber, 0), style: addHighlight(highlighted, boxNumber(rowNumber, 0))}, []),
-        h("div", {class: "box", onClick: () => boxNumber(rowNumber, 1), style: addHighlight(highlighted, boxNumber(rowNumber, 1))}, []),
-        h("div", {class: "box", onClick: () => boxNumber(rowNumber, 2), style: addHighlight(highlighted, boxNumber(rowNumber, 2))}, []),
-        h("div", {class: "box", onClick: () => boxNumber(rowNumber, 3), style: addHighlight(highlighted, boxNumber(rowNumber, 3))}, []), 
-        h("div", {class: "box", onClick: () => boxNumber(rowNumber, 4), style: addHighlight(highlighted, boxNumber(rowNumber, 4))}, []),
-        h("div", {class: "box", onClick: () => boxNumber(rowNumber, 5), style: addHighlight(highlighted, boxNumber(rowNumber, 5))}, []),
-        h("div", {class: "box", onClick: () => boxNumber(rowNumber, 6), style: addHighlight(highlighted, boxNumber(rowNumber, 6))}, []), 
-        h("div", {class: "box", onClick: () => boxNumber(rowNumber, 7), style: addHighlight(highlighted, boxNumber(rowNumber, 7))}, []),
-    ]);
+    let boxes = [];
+    for (let i = 0; i < 8; i++) {
+      boxes.push(h("div", {class: "box", onClick: () => boxNumber(rowNumber, i), style: addHighlight(highlighted, boxNumber(rowNumber, i))}, []));
+    }
+
+    return h("div", {class: "row"}, boxes);
 }
 
 function view(state) {
