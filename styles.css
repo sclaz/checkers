@@ -3,7 +3,7 @@
 }
 
 body {
-    background-color: green;
+    background-color: #569537;
 }
 
 #title {
@@ -11,8 +11,8 @@ body {
 }
 
 .board {
-    border:2px solid brown;
-    width: 404;
+    border:4px double #402909;
+    width: 408;
     margin: auto;
 }
 
@@ -21,16 +21,44 @@ body {
 }
 
 .box {
-    border:2px solid brown;
+    border:2px solid #402909;
     width: 50px;
     height: 50px;
     display: inline-block;
 }
 
 .row:nth-child(even) .box:nth-child(odd) {
-    background-color: black;
+    background-color: #654321;
 }
 
 .row:nth-child(odd) .box:nth-child(even) {
-    background-color: black;
+    background-color: #654321;
+}
+
+
+.row:nth-child(even) .box:nth-child(even) {
+    background-color: #F0C581;
+}
+
+.row:nth-child(odd) .box:nth-child(odd) {
+    background-color: #F0C581;
+}
+
+
+.white {
+    background-color: white;
+    border: 5px double gray;
+}
+
+.black {
+    background-color: rgb(85, 84, 84);
+    border: 5px double black;
+}
+
+.piece {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    margin: auto;
+    
 }
