@@ -18,23 +18,31 @@ function update(state, msg) {
 }
 
 function row(highlighted, rowNumber) {
+
     const boxes = [];
     for (let i = 0; i < 8; i++) {
+
         const number = boxNumber(rowNumber, i);
+
+        let isWhitePiece = initialState.piecesWhite.includes(number);
+        let isBlackPiece = initialState.piecesBlack.includes(number);
+        
         const properties = { 
             class: "box", 
-            onClick: () => number, 
-            style: addHighlight(highlighted, number)
+            onClick: () => {
+                return isBlackPiece ? number : undefined;
+            }, 
+            style: boxStyle(highlighted, number)
         };
         let box = h("div", properties, []);
         
-        let a = initialState.piecesWhite.includes(number);
-        let b = initialState.piecesBlack.includes(number);
-        if (a === true) {
+
+
+        if (isWhitePiece) {
              box = h("div", properties, [
                 h("div", {class:"piece white"}, [])
             ]);
-        } else if (b === true) {
+        } else if (isBlackPiece) {
             box = h("div", properties, [
                 h("div", {class:"piece black"}, [])
             ]);
@@ -61,9 +69,8 @@ function view(state) {
     ];
 }
 
-function addHighlight (n, boxNumber) {
+function boxStyle (n, boxNumber) {
     return n == boxNumber ? "background-color: yellow" : "";
-    
 }
 
 function boxNumber(rowNumber, columnNumber){
