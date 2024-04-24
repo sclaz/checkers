@@ -4,12 +4,13 @@ const { init, h, text } = UI;
 const root = document.querySelector("#container");
 
 const initialState = { 
+    gamePlaying: false,
     selected: -1,
     blackTurn: true,
-    piecesWhite: [0, 2, 4, 6, 9, 11, 13, 15, 16, 18, 20, 22],
+    piecesWhite: [1, 3, 5, 7, 8, 10, 12, 14, 17, 19, 21, 23],
     piecesBlack: [40, 42, 44, 46, 49, 51, 53, 55, 56, 58, 60, 62],
-    whitebox: [0, 2, 4, 6, 9, 11, 13, 15, 16, 18, 20, 22, 25, 27, 29, 31, 32, 34, 36, 38, 41, 43, 45, 47, 48, 50, 52, 54, 57, 59, 61],
-    blackBox: [1, 3, 5, 7, 8, 10, 12, 14, 17, 19, 21, 23, 24, 26, 28, 30, 33, 35, 37, 39, 40, 42, 44, 46, 49, 51, 53, 55, 56, 58, 60, 62],
+   // whitebox: [0, 2, 4, 6, 9, 11, 13, 15, 16, 18, 20, 22, 25, 27, 29, 31, 32, 34, 36, 38, 41, 43, 45, 47, 48, 50, 52, 54, 57, 59, 61],
+    //blackBox: [1, 3, 5, 7, 8, 10, 12, 14, 17, 19, 21, 23, 24, 26, 28, 30, 33, 35, 37, 39, 40, 42, 44, 46, 49, 51, 53, 55, 56, 58, 60, 62],
 };
 
 init(root, initialState, update, view); 
@@ -19,12 +20,16 @@ function update(state, msg) {
     return state;
 }
 
+function startGameBtn(){
+    //???????
+};
+
 function row(highlighted, rowNumber) {
 
     const boxes = [];
-    for (let i = 0; i < 8; i++) {
+    for (let columnNumber = 0; columnNumber < 8; columnNumber++) {
 
-        const number = boxNumber(rowNumber, i);
+        const number = boxNumber(rowNumber, columnNumber);
 
         let isWhitePiece = initialState.piecesWhite.includes(number);
         let isBlackPiece = initialState.piecesBlack.includes(number);
@@ -38,7 +43,7 @@ function row(highlighted, rowNumber) {
                 }
                 
             }, 
-            style: boxStyle(highlighted, number),
+            style: boxStyle(highlighted, number, rowNumber, columnNumber),
 
         };
         let box = h("div", properties, []);
@@ -65,6 +70,11 @@ function row(highlighted, rowNumber) {
 }
 
 function view(state) {
+   
+   // if (initialState.gamePlaying == false) {
+   //     return 
+   // } 
+
     let rows = [];
     for (let i = 0; i < 8; i++) {
         rows.push(row(state.selected, i));
@@ -76,10 +86,9 @@ function view(state) {
     ];
 }
 
-function boxStyle (highlighted, boxNumber) {
-    
-    const number = boxNumber;
-    let isblackBox = initialState.blackBox.includes(number);
+function boxStyle (highlighted, boxNumber, rowNumber, columnNumber) {
+
+    let isblackBox = isBlackBox(rowNumber, columnNumber);
 
     const isSelected = boxNumber == highlighted;
     const isRelevant = boxNumber == (highlighted - 7);
@@ -96,6 +105,18 @@ function boxStyle (highlighted, boxNumber) {
 function boxNumber(rowNumber, columnNumber){
     let i = rowNumber * 8 + columnNumber
     return i;
+}
+
+function isBlackBox(rowNumber, colNumber) {
+    if (isEven(rowNumber) && isEven(colNumber)){
+        return false;
+    } else if (isEven(rowNumber)== false && isEven(colNumber) == false){
+        return false;
+    } else return true;
+}
+
+function isEven(n){
+    return n % 2 == 0;
 }
 
 
