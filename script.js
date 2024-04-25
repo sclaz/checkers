@@ -9,14 +9,17 @@ const initialState = {
     blackTurn: true,
     piecesWhite: [1, 3, 5, 7, 8, 10, 12, 14, 17, 19, 21, 23],
     piecesBlack: [40, 42, 44, 46, 49, 51, 53, 55, 56, 58, 60, 62],
-   // whitebox: [0, 2, 4, 6, 9, 11, 13, 15, 16, 18, 20, 22, 25, 27, 29, 31, 32, 34, 36, 38, 41, 43, 45, 47, 48, 50, 52, 54, 57, 59, 61],
-    //blackBox: [1, 3, 5, 7, 8, 10, 12, 14, 17, 19, 21, 23, 24, 26, 28, 30, 33, 35, 37, 39, 40, 42, 44, 46, 49, 51, 53, 55, 56, 58, 60, 62],
 };
 
 init(root, initialState, update, view); 
 
 function update(state, msg) {
-    state.selected = msg;
+    if (msg.tag == "boxClicked") {
+        state.selected = msg.number;
+    } else if(msg.tag == "gameStarted") {
+        state.gamePlaying = true;
+    }
+
     return state;
 }
 
@@ -37,9 +40,8 @@ function row(highlighted, rowNumber) {
         const properties = { 
             class: "box", 
             onClick: () => {
-                if (isBlackPiece) {
-                    return number;
-
+                if (isBlackPiece || isWhitePiece) {
+                    return { tag: "boxClicked", number: number };
                 }
                 
             }, 
@@ -71,9 +73,20 @@ function row(highlighted, rowNumber) {
 
 function view(state) {
    
-   // if (initialState.gamePlaying == false) {
-   //     return 
-   // } 
+    if (!initialState.gamePlaying) {
+        return [
+            h("h1", {id:"title"}, [text("Checkers")]),
+            h(
+                "button", 
+                { class: "startBtn", 
+                  onClick: () => {
+                    return { tag: "gameStarted" };
+                  } 
+                }, 
+                [text("Play")]
+            )
+        ]
+    };
 
     let rows = [];
     for (let i = 0; i < 8; i++) {
@@ -88,17 +101,25 @@ function view(state) {
 
 function boxStyle (highlighted, boxNumber, rowNumber, columnNumber) {
 
-    let isblackBox = isBlackBox(rowNumber, columnNumber);
+    if (!isBlackBox(rowNumber, columnNumber)) {
+        return "";
+    }
+    let isBlackPiece = initialState.piecesBlack.includes(boxNumber);
+    let isWhitePiece = initialState.piecesWhite.includes(boxNumber);
+    
 
     const isSelected = boxNumber == highlighted;
-    const isRelevant = boxNumber == (highlighted - 7);
+    const isRelevant1 = boxNumber == (highlighted - 7);
     const isRelevant2 = boxNumber == (highlighted - 9);
+    const isRelevant3 = boxNumber == (highlighted + 7);
+    const isRelevant4 = boxNumber == (highlighted + 9);
+    const isEmptySpace = !isBlackPiece && !isWhitePiece;
+    const isRelevant = isRelevant1 || isRelevant2 || isRelevant3 || isRelevant4
+
     if (isSelected) {
         return "background-color: #a37000; border: 3px double #FFFF00";
-    } else if (isRelevant && isblackBox) {
+    } else if (isEmptySpace && isRelevant) {
         return "background-color: #7a9c59; border: 3px double #00FF00";
-    } else if (isRelevant2 && isblackBox){
-        return "background-color: #7a9c59; border: 3px double #00FF00";  
     }
 }
 
