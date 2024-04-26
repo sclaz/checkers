@@ -4,7 +4,7 @@ const { init, h, text } = UI;
 const root = document.querySelector("#container");
 
 const initialState = { 
-    gamePlaying: false,
+    gamePlaying: true,
     selected: -1,
     blackTurn: true,
     piecesWhite: [1, 3, 5, 7, 8, 10, 12, 14, 17, 19, 21, 23],
@@ -15,17 +15,39 @@ init(root, initialState, update, view);
 
 function update(state, msg) {
     if (msg.tag == "boxClicked") {
-        state.selected = msg.number;
+        const boxClicked = msg.number;
+
+        let isSelectingAPiece = state.piecesWhite.includes(boxClicked) 
+                || state.piecesBlack.includes(boxClicked);
+
+        let allowedMoves = [
+            state.selected - 7, 
+            state.selected - 9, 
+            state.selected + 7, 
+            state.selected + 9
+        ];
+
+        let isMovingASelectedPiece = allowedMoves.includes(boxClicked);
+
+        if (isSelectingAPiece) {
+            state.selected = boxClicked;
+        } else if (isMovingASelectedPiece) {
+            let newBlackPieces0 = state.piecesBlack.filter(function (value) { 
+                return value !== state.selected;
+            });
+            let newBlackPieces = newBlackPieces0.concat([boxClicked]);
+
+            state.piecesBlack = newBlackPieces;
+            state.selected = -1;
+        }
+        
+        
     } else if(msg.tag == "gameStarted") {
         state.gamePlaying = true;
     }
 
     return state;
 }
-
-function startGameBtn(){
-    //???????
-};
 
 function row(highlighted, rowNumber) {
 
@@ -40,10 +62,7 @@ function row(highlighted, rowNumber) {
         const properties = { 
             class: "box", 
             onClick: () => {
-                if (isBlackPiece || isWhitePiece) {
-                    return { tag: "boxClicked", number: number };
-                }
-                
+                return { tag: "boxClicked", number: number };  
             }, 
             style: boxStyle(highlighted, number, rowNumber, columnNumber),
 
