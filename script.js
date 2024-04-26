@@ -39,6 +39,7 @@ function update(state, msg) {
 
             state.piecesBlack = newBlackPieces;
             state.selected = -1;
+            state.blackTurn = false;
         }
         
         
@@ -112,8 +113,11 @@ function view(state) {
         rows.push(row(state.selected, i));
     }
 
+    let playerTurn = state.blackTurn ? "Black" : "White";
+
     return [
         h("h1", {id:"title"}, [text("Checkers")]),
+        h("h2", {class: "playerTurn"}, [text(`${playerTurn}'s Turn`)]),  
         h("div", {class: "board"}, rows),       
     ];
 }

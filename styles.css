@@ -33,6 +33,11 @@ body {
     cursor: pointer;
 }
 
+.playerTurn {
+    text-align: center;
+    text-shadow: 1px 1px #b6a6a6;
+}
+
 .board {
     border:4px double #402909;
     width: 408;
