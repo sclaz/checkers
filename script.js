@@ -14,7 +14,59 @@ const initialState = {
 init(root, initialState, update, view); 
 
 function update(state, msg) {
-    if (msg.tag == "boxClicked") {
+    if (state.blackTurn && msg.tag == "boxClicked") {
+        const boxClicked = msg.number;
+
+        let isSelectingAPiece = state.piecesBlack.includes(boxClicked);
+
+        let allowedMoves = [
+            state.selected - 7, 
+            state.selected - 9
+        ];
+
+        let isMovingASelectedPiece = allowedMoves.includes(boxClicked);
+
+        if (isSelectingAPiece) {
+            state.selected = boxClicked;
+        } else if (isMovingASelectedPiece) {
+            let newBlackPieces0 = state.piecesBlack.filter(function (value) { 
+                return value !== state.selected;
+            });
+            let newBlackPieces = newBlackPieces0.concat([boxClicked]);
+
+            state.piecesBlack = newBlackPieces;
+            state.selected = -1;
+            state.blackTurn = false;
+        }
+    }   
+    if (!state.blackTurn && msg.tag == "boxClicked") {
+        const boxClicked = msg.number;
+
+        let isSelectingAPiece2 = state.piecesWhite.includes(boxClicked);
+
+        let allowedMoves2 = [
+            state.selected + 7, 
+            state.selected + 9, 
+        ];
+
+        let isMovingASelectedPiece2 = allowedMoves2.includes(boxClicked);
+
+        if (isSelectingAPiece2) {
+            state.selected = boxClicked;
+        } else if (isMovingASelectedPiece2) {
+            let newWhitePieces0 = state.piecesWhite.filter(function (value) { 
+                return value !== state.selected;
+            });
+            let newWhitePieces = newWhitePieces0.concat([boxClicked]);
+
+            state.piecesWhite = newWhitePieces;
+            state.selected = -1;
+            state.blackTurn = true;
+        }
+        
+        
+        /*
+        if (state.blackTurn && msg.tag == "boxClicked") {
         const boxClicked = msg.number;
 
         let isSelectingAPiece = state.piecesWhite.includes(boxClicked) 
@@ -41,7 +93,7 @@ function update(state, msg) {
             state.selected = -1;
             state.blackTurn = false;
         }
-        
+        */
         
     } else if(msg.tag == "gameStarted") {
         state.gamePlaying = true;
@@ -162,5 +214,3 @@ function isBlackBox(rowNumber, colNumber) {
 function isEven(n){
     return n % 2 == 0;
 }
-
-
