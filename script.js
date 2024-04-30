@@ -18,6 +18,7 @@ function update(state, msg) {
         const boxClicked = msg.number;
 
         let isSelectingAPiece = state.piecesBlack.includes(boxClicked);
+        let isSelectingAPiece2 = state.piecesWhite.includes(boxClicked);
 
         let allowedMoves = [
             state.selected - 7, 
@@ -28,7 +29,7 @@ function update(state, msg) {
 
         if (isSelectingAPiece) {
             state.selected = boxClicked;
-        } else if (isMovingASelectedPiece) {
+        } else if (isMovingASelectedPiece && !isSelectingAPiece2 && !isSelectingAPiece) {
             let newBlackPieces0 = state.piecesBlack.filter(function (value) { 
                 return value !== state.selected;
             });
@@ -42,6 +43,7 @@ function update(state, msg) {
     if (!state.blackTurn && msg.tag == "boxClicked") {
         const boxClicked = msg.number;
 
+        let isSelectingAPiece = state.piecesBlack.includes(boxClicked);
         let isSelectingAPiece2 = state.piecesWhite.includes(boxClicked);
 
         let allowedMoves2 = [
@@ -53,7 +55,7 @@ function update(state, msg) {
 
         if (isSelectingAPiece2) {
             state.selected = boxClicked;
-        } else if (isMovingASelectedPiece2) {
+        } else if (isMovingASelectedPiece2 && !isSelectingAPiece2 && !isSelectingAPiece) {
             let newWhitePieces0 = state.piecesWhite.filter(function (value) { 
                 return value !== state.selected;
             });
@@ -63,37 +65,6 @@ function update(state, msg) {
             state.selected = -1;
             state.blackTurn = true;
         }
-        
-        
-        /*
-        if (state.blackTurn && msg.tag == "boxClicked") {
-        const boxClicked = msg.number;
-
-        let isSelectingAPiece = state.piecesWhite.includes(boxClicked) 
-                || state.piecesBlack.includes(boxClicked);
-
-        let allowedMoves = [
-            state.selected - 7, 
-            state.selected - 9, 
-            state.selected + 7, 
-            state.selected + 9
-        ];
-
-        let isMovingASelectedPiece = allowedMoves.includes(boxClicked);
-
-        if (isSelectingAPiece) {
-            state.selected = boxClicked;
-        } else if (isMovingASelectedPiece) {
-            let newBlackPieces0 = state.piecesBlack.filter(function (value) { 
-                return value !== state.selected;
-            });
-            let newBlackPieces = newBlackPieces0.concat([boxClicked]);
-
-            state.piecesBlack = newBlackPieces;
-            state.selected = -1;
-            state.blackTurn = false;
-        }
-        */
         
     } else if(msg.tag == "gameStarted") {
         state.gamePlaying = true;
@@ -181,6 +152,8 @@ function boxStyle (highlighted, boxNumber, rowNumber, columnNumber) {
     }
     let isBlackPiece = initialState.piecesBlack.includes(boxNumber);
     let isWhitePiece = initialState.piecesWhite.includes(boxNumber);
+
+    let blackTurn = initialState.blackTurn;
     
 
     const isSelected = boxNumber == highlighted;
@@ -189,12 +162,15 @@ function boxStyle (highlighted, boxNumber, rowNumber, columnNumber) {
     const isRelevant3 = boxNumber == (highlighted + 7);
     const isRelevant4 = boxNumber == (highlighted + 9);
     const isEmptySpace = !isBlackPiece && !isWhitePiece;
-    const isRelevant = isRelevant1 || isRelevant2 || isRelevant3 || isRelevant4
+    const isRelevantForBlack = isRelevant1 || isRelevant2;
+    const isRelevantForWhite = isRelevant3 || isRelevant4
 
     if (isSelected) {
         return "background-color: #a37000; border: 3px double #FFFF00";
-    } else if (isEmptySpace && isRelevant) {
+    } else if (isEmptySpace && blackTurn && isRelevantForBlack) {
         return "background-color: #7a9c59; border: 3px double #00FF00";
+    } else if (isEmptySpace && !blackTurn && isRelevantForWhite) {
+    return "background-color: #7a9c59; border: 3px double #00FF00";
     }
 }
 
