@@ -22,7 +22,9 @@ function update(state, msg) {
 
         let allowedMoves = [
             state.selected - 7, 
-            state.selected - 9
+            state.selected - 9,
+            state.selected - 14,
+            state.selected - 18
         ];
 
         let isMovingASelectedPiece = allowedMoves.includes(boxClicked);
@@ -33,6 +35,22 @@ function update(state, msg) {
             let newBlackPieces0 = state.piecesBlack.filter(function (value) { 
                 return value !== state.selected;
             });
+
+            let newWhitePieces = state.piecesWhite;
+            if ((state.selected - 9) == allowedMoves[1]) {
+                newWhitePieces = state.piecesWhite.filter(function (value) { 
+                    return value !== (state.selected - 9)
+                });
+            }
+
+            if ((state.selected - 7) == allowedMoves[0]) {
+                newWhitePieces = state.piecesWhite.filter(function (value) { 
+                    return value !== (state.selected - 7)
+                });
+            }
+            
+            state.piecesWhite = newWhitePieces;
+
             let newBlackPieces = newBlackPieces0.concat([boxClicked]);
 
             state.piecesBlack = newBlackPieces;
@@ -49,6 +67,8 @@ function update(state, msg) {
         let allowedMoves2 = [
             state.selected + 7, 
             state.selected + 9, 
+            state.selected + 14,
+            state.selected + 18
         ];
 
         let isMovingASelectedPiece2 = allowedMoves2.includes(boxClicked);
@@ -59,6 +79,22 @@ function update(state, msg) {
             let newWhitePieces0 = state.piecesWhite.filter(function (value) { 
                 return value !== state.selected;
             });
+           
+            let newBlackPieces = state.piecesBlack;
+            if ((state.selected + 9) == allowedMoves2[1]) {
+                newBlackPieces = state.piecesBlack.filter(function (value) { 
+                    return value !== (state.selected + 9)
+                });
+            }
+
+            if ((state.selected + 7) == allowedMoves2[0]) {
+                newBlackPieces = state.piecesBlack.filter(function (value) { 
+                    return value !== (state.selected + 7)
+                });
+            }
+            
+            state.piecesBlack = newBlackPieces;
+                    
             let newWhitePieces = newWhitePieces0.concat([boxClicked]);
 
             state.piecesWhite = newWhitePieces;
@@ -157,20 +193,48 @@ function boxStyle (highlighted, boxNumber, rowNumber, columnNumber) {
     
 
     const isSelected = boxNumber == highlighted;
-    const isRelevant1 = boxNumber == (highlighted - 7);
-    const isRelevant2 = boxNumber == (highlighted - 9);
-    const isRelevant3 = boxNumber == (highlighted + 7);
-    const isRelevant4 = boxNumber == (highlighted + 9);
+    const isPossibleMove1 = boxNumber == (highlighted - 7);
+    const isPossibleMove2 = boxNumber == (highlighted - 9);
+    const isPossibleMove3 = boxNumber == (highlighted + 7);
+    const isPossibleMove4 = boxNumber == (highlighted + 9);
+
+    const isPossibleMove5 = boxNumber == (highlighted - 14);
+    const isPossibleMove6 = boxNumber == (highlighted - 18);
+    const isPossibleMove7 = boxNumber == (highlighted + 14);
+    const isPossibleMove8 = boxNumber == (highlighted + 18);
+
+    const r1 = highlighted - 7;
+    const r2 = highlighted - 9;
+    const r3 = highlighted + 7;
+    const r4 = highlighted + 9;
+
     const isEmptySpace = !isBlackPiece && !isWhitePiece;
-    const isRelevantForBlack = isRelevant1 || isRelevant2;
-    const isRelevantForWhite = isRelevant3 || isRelevant4
+    const isPossibleMoveForBlack = isPossibleMove1 || isPossibleMove2;
+    const isPossibleMoveForWhite = isPossibleMove3 || isPossibleMove4;
+
+    const isPossibleMoveForBlack2 = isPossibleMove5 || isPossibleMove6;
+    const isPossibleMoveForWhite2 = isPossibleMove7 || isPossibleMove8;
+
+    let possibleEatBlackPiece1 = initialState.piecesBlack.includes(r3);
+    let possibleEatBlackPiece2 = initialState.piecesBlack.includes(r4);
+    let possibleEatWhitePiece3 = initialState.piecesWhite.includes(r1);
+    let possibleEatWhitePiece4 = initialState.piecesWhite.includes(r2);
+
+
+    const possibleEatWhitePiece = possibleEatWhitePiece3 || possibleEatWhitePiece4;
+    const possibleEatBlackPiece = possibleEatBlackPiece1 || possibleEatBlackPiece2;
 
     if (isSelected) {
         return "background-color: #a37000; border: 3px double #FFFF00";
-    } else if (isEmptySpace && blackTurn && isRelevantForBlack) {
+    } else if (isEmptySpace && blackTurn && isPossibleMoveForBlack) {
         return "background-color: #7a9c59; border: 3px double #00FF00";
-    } else if (isEmptySpace && !blackTurn && isRelevantForWhite) {
+    } else if (isEmptySpace && !blackTurn && isPossibleMoveForWhite) {
     return "background-color: #7a9c59; border: 3px double #00FF00";
+
+    } else if (isEmptySpace && blackTurn && isPossibleMoveForBlack2 && !isPossibleMoveForBlack && possibleEatWhitePiece) {
+        return "background-color: #7a9c59; border: 3px double #00FF00";
+    } else if (isEmptySpace && !blackTurn && isPossibleMoveForWhite2 && !isPossibleMoveForWhite && possibleEatBlackPiece) {
+        return "background-color: #7a9c59; border: 3px double #00FF00";
     }
 }
 
