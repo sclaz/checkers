@@ -232,86 +232,23 @@ function possibleMoves(piecesWhite, piecesBlack, selected) {
 
     return moves;
 
-
-
-
-
-    const allMoves = [
-        close.map(function (n) { return selected + n; }),
-        close.map(n => selected - n),
-        far.map(n => selected + n),
-        far.map(n => selected - n)
-    ].flat();
-
-    return allMoves;
-
-    // let isBlackPiece = initialState.piecesBlack.includes(boxNumber);
-    // let isWhitePiece = initialState.piecesWhite.includes(boxNumber);
-
-    // let blackTurn = initialState.blackTurn;
-    
-
-    
-    // const isPossibleMove1 = boxNumber == (highlighted - 7);
-    // const isPossibleMove2 = boxNumber == (highlighted - 9);
-    // const isPossibleMove3 = boxNumber == (highlighted + 7);
-    // const isPossibleMove4 = boxNumber == (highlighted + 9);
-
-    // const isPossibleMove5 = boxNumber == (highlighted - 14);
-    // const isPossibleMove6 = boxNumber == (highlighted - 18);
-    // const isPossibleMove7 = boxNumber == (highlighted + 14);
-    // const isPossibleMove8 = boxNumber == (highlighted + 18);
-
-    // const r1 = highlighted - 7;
-    // const r2 = highlighted - 9;
-    // const r3 = highlighted + 7;
-    // const r4 = highlighted + 9;
-
-    // const isEmptySpace = !isBlackPiece && !isWhitePiece;
-    // const isPossibleMoveForBlack = isPossibleMove1 || isPossibleMove2;
-    // const isPossibleMoveForWhite = isPossibleMove3 || isPossibleMove4;
-
-    // const isPossibleMoveForBlack2 = isPossibleMove5 || isPossibleMove6;
-    // const isPossibleMoveForWhite2 = isPossibleMove7 || isPossibleMove8;
-
-    // let possibleEatBlackPiece1 = initialState.piecesBlack.includes(r3);
-    // let possibleEatBlackPiece2 = initialState.piecesBlack.includes(r4);
-    // let possibleEatWhitePiece3 = initialState.piecesWhite.includes(r1);
-    // let possibleEatWhitePiece4 = initialState.piecesWhite.includes(r2);
-
-
-    // const possibleEatWhitePiece = possibleEatWhitePiece3 || possibleEatWhitePiece4;
-    // const possibleEatBlackPiece = possibleEatBlackPiece1 || possibleEatBlackPiece2;
-
-    // if (isSelected) {
-    //     return "background-color: #a37000; border: 3px double #FFFF00";
-    // } else if (isEmptySpace && blackTurn && isPossibleMoveForBlack) {
-    //     return "background-color: #7a9c59; border: 3px double #00FF00";
-    // } else if (isEmptySpace && !blackTurn && isPossibleMoveForWhite) {
-    // return "background-color: #7a9c59; border: 3px double #00FF00";
-
-    // } else if (isEmptySpace && blackTurn && isPossibleMoveForBlack2 && !isPossibleMoveForBlack && possibleEatWhitePiece) {
-    //     return "background-color: #7a9c59; border: 3px double #00FF00";
-    // } else if (isEmptySpace && !blackTurn && isPossibleMoveForWhite2 && !isPossibleMoveForWhite && possibleEatBlackPiece) {
-    //     return "background-color: #7a9c59; border: 3px double #00FF00";
-    // }
-    return [17,19];
 }
 
 function boxStyle (highlighted, moves, boxNumber) {
     const isSelected = boxNumber == highlighted;
+    let r = highlighted - 18;
     if (isSelected) {
         return "background-color: #a37000; border: 3px double #FFFF00";
     }
-
-    if (moves.includes(boxNumber)) {
-        return "background-color: #7a9c59; border: 3px double #00FF00";
+    if (!moves.includes(boxNumber)) {
+        return "";
     }
 
-    if (moves.includes(boxNumber) && moves.includes(boxNumber + 14 || - 14 || + 18 || -18)) {
+    if (Math.abs(boxNumber - highlighted) > 9 ) {
         return "background-color: #a72a2a; border: 3px double #FF3131";
     }
 
+    return "background-color: #7a9c59; border: 3px double #00FF00";
 }
 
 function boxNumber(rowNumber, columnNumber){
