@@ -15,48 +15,36 @@ init(root, initialState, update, view);
 
 function update(state, msg) {
     if (state.blackTurn && msg.tag == "boxClicked") {
+        const farLeft = state.selected - 18;
+        const farRight = state.selected - 14;
+        const closeLeft = state.selected - 9;
+        const closeRight = state.selected - 7;
+
         const boxClicked = msg.number;
 
         let isSelectingAPiece = state.piecesBlack.includes(boxClicked);
-        let isSelectingAPiece2 = state.piecesWhite.includes(boxClicked);
-
-        let allowedMoves = [
-            state.selected - 7, 
-            state.selected - 9,
-            state.selected - 14,
-            state.selected - 18
-        ];
-
-        let isMovingASelectedPiece = allowedMoves.includes(boxClicked);
+        let allPossibleMoves = possibleMoves(state.piecesWhite, state.piecesBlack, state.selected); 
+        let isPossibleMove = allPossibleMoves.includes(boxClicked);
 
         if (isSelectingAPiece) {
             state.selected = boxClicked;
-        } else if (isMovingASelectedPiece && !isSelectingAPiece2 && !isSelectingAPiece) {
-            let newBlackPieces0 = state.piecesBlack.filter(function (value) { 
-                return value !== state.selected;
-            });
+        } else if (isPossibleMove) {
+            // Move selected piece
+            state.piecesBlack = state.piecesBlack
+                .filter(value => value !== state.selected)
+                .concat([boxClicked]);
 
-            let newWhitePieces = state.piecesWhite;
-            if ((state.selected - 9) == allowedMoves[1]) {
-                newWhitePieces = state.piecesWhite.filter(function (value) { 
-                    return value !== (state.selected - 9)
-                });
+            // Take oponent's piece
+            if (boxClicked == farLeft) {
+                state.piecesWhite = state.piecesWhite.filter(value => value !== closeLeft);
+            } else if (boxClicked == farRight) {
+                state.piecesWhite = state.piecesWhite.filter(value => value !== closeRight);
             }
 
-            if ((state.selected - 7) == allowedMoves[0]) {
-                newWhitePieces = state.piecesWhite.filter(function (value) { 
-                    return value !== (state.selected - 7)
-                });
-            }
-            
-            state.piecesWhite = newWhitePieces;
-
-            let newBlackPieces = newBlackPieces0.concat([boxClicked]);
-
-            state.piecesBlack = newBlackPieces;
             state.selected = -1;
             state.blackTurn = false;
         }
+        
     }   
     if (!state.blackTurn && msg.tag == "boxClicked") {
         const boxClicked = msg.number;
@@ -64,6 +52,10 @@ function update(state, msg) {
         let isSelectingAPiece = state.piecesBlack.includes(boxClicked);
         let isSelectingAPiece2 = state.piecesWhite.includes(boxClicked);
 
+        let allPossibleMoves = possibleMoves(state.piecesWhite, state.piecesBlack, state.selected); 
+        let isPossibleMove = allPossibleMoves.includes(boxClicked);
+
+        
         let allowedMoves2 = [
             state.selected + 7, 
             state.selected + 9, 
@@ -72,10 +64,12 @@ function update(state, msg) {
         ];
 
         let isMovingASelectedPiece2 = allowedMoves2.includes(boxClicked);
+        
 
         if (isSelectingAPiece2) {
             state.selected = boxClicked;
-        } else if (isMovingASelectedPiece2 && !isSelectingAPiece2 && !isSelectingAPiece) {
+        } //else if (isMovingASelectedPiece2 && !isSelectingAPiece2 && !isSelectingAPiece) {
+          else if (isPossibleMove) {
             let newWhitePieces0 = state.piecesWhite.filter(function (value) { 
                 return value !== state.selected;
             });
@@ -101,6 +95,8 @@ function update(state, msg) {
             state.selected = -1;
             state.blackTurn = true;
         }
+
+
         
     } else if(msg.tag == "gameStarted") {
         state.gamePlaying = true;
@@ -132,10 +128,22 @@ function row(state, rowNumber) {
         
 
 
-        if (isWhitePiece) {
-             box = h("div", properties, [
-                h("div", {class:"piece white"}, [])
+        if (isWhitePiece && rowNumber === 7) { // i added this extra if statement parag
+            box = h("div", properties, [
+                h("div", {class:"piece white"}, [
+                    h("div", {class:"special"}, []) //I added this child
+                ]), 
+            ]); 
+        } else if (isWhitePiece) { // added this parag
+            box = h("div", properties, [
+                h("div", {class:"piece white"}, []),
             ]);
+        } else if (isBlackPiece && rowNumber === 0) { // i added this extra if statement parag
+            box = h("div", properties, [
+                h("div", {class:"piece black"}, [
+                    h("div", {class:"special"}, []) //I added this child
+                ]), 
+            ]);    
         } else if (isBlackPiece) {
             box = h("div", properties, [
                 h("div", {class:"piece black"}, [])

@@ -91,3 +91,8 @@ body {
     
 }
 
+.special {
+    border: 8px double gray;
+    border-radius: 50%;
+}
+
