@@ -47,56 +47,35 @@ function update(state, msg) {
         
     }   
     if (!state.blackTurn && msg.tag == "boxClicked") {
+        const farRight = state.selected + 18;
+        const farLeft = state.selected + 14;
+        const closeRight = state.selected + 9;
+        const closeLeft = state.selected + 7;
+
         const boxClicked = msg.number;
 
-        let isSelectingAPiece = state.piecesBlack.includes(boxClicked);
-        let isSelectingAPiece2 = state.piecesWhite.includes(boxClicked);
-
+        let isSelectingAPiece = state.piecesWhite.includes(boxClicked);
         let allPossibleMoves = possibleMoves(state.piecesWhite, state.piecesBlack, state.selected); 
         let isPossibleMove = allPossibleMoves.includes(boxClicked);
 
-        
-        let allowedMoves2 = [
-            state.selected + 7, 
-            state.selected + 9, 
-            state.selected + 14,
-            state.selected + 18
-        ];
-
-        let isMovingASelectedPiece2 = allowedMoves2.includes(boxClicked);
-        
-
-        if (isSelectingAPiece2) {
+        if (isSelectingAPiece) {
             state.selected = boxClicked;
-        } //else if (isMovingASelectedPiece2 && !isSelectingAPiece2 && !isSelectingAPiece) {
-          else if (isPossibleMove) {
-            let newWhitePieces0 = state.piecesWhite.filter(function (value) { 
-                return value !== state.selected;
-            });
-           
-            let newBlackPieces = state.piecesBlack;
-            if ((state.selected + 9) == allowedMoves2[1]) {
-                newBlackPieces = state.piecesBlack.filter(function (value) { 
-                    return value !== (state.selected + 9)
-                });
-            }
+        } else if (isPossibleMove) {
+            // Move selected piece
+            state.piecesWhite = state.piecesWhite
+                .filter(value => value !== state.selected) 
+                .concat([boxClicked]);
 
-            if ((state.selected + 7) == allowedMoves2[0]) {
-                newBlackPieces = state.piecesBlack.filter(function (value) { 
-                    return value !== (state.selected + 7)
-                });
+            // Take oponent's piece
+            if (boxClicked == farLeft) {
+                state.piecesBlack = state.piecesBlack.filter(value => value !== closeLeft);
+            } else if (boxClicked == farRight) {
+                state.piecesBlack = state.piecesBlack.filter(value => value !== closeRight);
             }
             
-            state.piecesBlack = newBlackPieces;
-                    
-            let newWhitePieces = newWhitePieces0.concat([boxClicked]);
-
-            state.piecesWhite = newWhitePieces;
             state.selected = -1;
             state.blackTurn = true;
         }
-
-
         
     } else if(msg.tag == "gameStarted") {
         state.gamePlaying = true;
